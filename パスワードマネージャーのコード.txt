@@ -1,0 +1,39 @@
+#実行時の表示
+
+password_file="password.txt"
+
+echo "パスワードマネージャーへようこそ！"
+while true; do
+    echo "次の選択肢から入力してください(Add Password/Get Password/Exit)："
+    read choice
+    if [ "$choice" == "add" ]; then
+        echo "サービス名を入力してください：" 
+        read service
+        echo "ユーザー名を入力してください：" 
+        read user
+        echo "パスワードを入力してください：" 
+        read pass
+        # 入力が完了したら
+        echo "$service.$user.$pass" >> "$password_file"
+        echo "パスワードの追加は成功しました。"
+    elif [ "$choice" == "get" ]; then
+        echo "サービス名を入力してください：" 
+        read service
+        user=$(awk -v service="$service" -F '.' '$1 == service {print $2}' "$password_file")
+        pass=$(awk -v service="$service" -F '.' '$1 == service {print $3}' "$password_file")            
+        if [ -n "$user" ]; then
+                # 取得したユーザー名とパスワードを出力する
+                echo "サービス名：$service"
+                echo "ユーザー名：$user"
+                echo "パスワード：$pass"
+            else
+                echo "そのサービスは登録されていません。"
+            fi
+    elif [ "$choice" == "exit" ]; then
+        # Exit が入力された場合
+        echo "Thank you!"
+        exit
+    else
+        echo "入力が間違えています。Add Password/Get Password/Exit から入力してください。"
+    fi
+done
